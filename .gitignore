@@ -46,3 +46,6 @@ buildNumber.properties
 *.swp
 *.png~
 Release/
+
+lib/
+native/
