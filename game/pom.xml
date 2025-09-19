@@ -14,13 +14,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
-    <lwjgl.version>3.3.6</lwjgl.version>
   </properties>
-
-  <profiles>
-	<profile><id>lwjgl-natives-windows-amd64</id><activation><os><family>windows</family><arch>amd64</arch></os></activation><properties><lwjgl.natives>natives-windows</lwjgl.natives></properties></profile>
-	<profile><id>lwjgl-natives-windows-aarch64</id><activation><os><family>windows</family><arch>aarch64</arch></os></activation><properties><lwjgl.natives>natives-windows-arm64</lwjgl.natives></properties></profile>
-</profiles>
 
   <dependencyManagement>
     <dependencies>
@@ -31,13 +25,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-		<dependency>
-			<groupId>org.lwjgl</groupId>
-			<artifactId>lwjgl-bom</artifactId>
-			<version>${lwjgl.version}</version>
-			<scope>import</scope>
-			<type>pom</type>
-		</dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -53,27 +40,6 @@
       <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-assimp</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-bgfx</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-glfw</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-nanovg</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-nuklear</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-openal</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-opengl</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-par</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-stb</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-vulkan</artifactId></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-assimp</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-bgfx</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-glfw</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-nanovg</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-nuklear</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-openal</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-opengl</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-par</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
-	<dependency><groupId>org.lwjgl</groupId><artifactId>lwjgl-stb</artifactId><classifier>${lwjgl.natives}</classifier></dependency>
   </dependencies>
 
   <build>
@@ -118,30 +84,6 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.6.1</version>
         </plugin>
-        <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version> <!-- Use a recent version -->
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>pupungeggang4.App</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId> <!-- Optional: Avoids appending "-jar-with-dependencies" to the filename -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
       </plugins>
     </pluginManagement>
   </build>
