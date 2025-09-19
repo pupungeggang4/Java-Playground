@@ -1,2 +1,2 @@
 Main-Class: HelloWorld
-Class-Path: lib/lwjgl.jar lib/lwjgl-assimp.jar lib/lwjgl-bgfx.jar lib/lwjgl-glfw.jar lib/lwjgl-nanovg.jar lib/lwjgl-nuklear.jar lib/lwjgl-openal.jar lib/lwjgl-opengl.jar lib/lwjgl-par.jar lib/lwjgl-stb.jar lib/lwjgl-vulkan.jar
+Class-Path: lib/
