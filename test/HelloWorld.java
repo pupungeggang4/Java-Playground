@@ -44,6 +44,10 @@ public class HelloWorld {
 				glfwSetWindowShouldClose(window, true);
 		});
 
+		glfwSetWindowSizeCallback(window, (window, width, height) -> {
+			glViewport(0, 0, width, height);
+		});
+
 		try ( MemoryStack stack = stackPush() ) {
 			IntBuffer pWidth = stack.mallocInt(1);
 			IntBuffer pHeight = stack.mallocInt(1);
