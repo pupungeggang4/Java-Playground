@@ -50,3 +50,5 @@ Release/
 lib/
 shared/
 native/
+release/
+*.exe
