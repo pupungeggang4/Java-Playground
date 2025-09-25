@@ -48,4 +48,5 @@ buildNumber.properties
 Release/
 
 lib/
+shared/
 native/
