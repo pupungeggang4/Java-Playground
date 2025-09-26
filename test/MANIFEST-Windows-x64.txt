@@ -1,2 +1,2 @@
 Main-Class: HelloWorld
-Class-Path: lib/lwjgl.jar lib/lwjgl-glfw.jar lib/lwjgl-opengl.jar lib/lwjgl-natives-windows.jar
+Class-Path: lib/lwjgl.jar lib/lwjgl-glfw.jar lib/lwjgl-opengl.jar lib/lwjgl-natives-windows.jar lib/lwjgl-glfw-natives-windows.jar lib/lwjgl-opengl-natives-windows.jar

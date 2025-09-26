@@ -52,3 +52,6 @@ shared/
 native/
 release/
 *.exe
+
+*.dll
+*.so
