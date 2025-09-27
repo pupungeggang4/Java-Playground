@@ -51,6 +51,7 @@ lib/
 shared/
 native/
 release/
+lwjgl/
 
 main
 *.exe

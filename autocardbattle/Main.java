@@ -13,6 +13,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
     public static void main(String[] args) {
+        System.setProperty("org.lwjgl.librarypath", "lib");
         Game game = new Game();
         game.init();
         game.loop();

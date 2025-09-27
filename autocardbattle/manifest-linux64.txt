@@ -1,0 +1,2 @@
+Main-Class: Main
+Class-Path: lwjgl/lwjgl.jar lwjgl/lwjgl-natives-linux.jar lwjgl/lwjgl-glfw.jar lwjgl/lwjgl-glfw-natives-linux.jar lwjgl/lwjgl-opengl.jar lwjgl/lwjgl-opengl-natives-linux.jar
