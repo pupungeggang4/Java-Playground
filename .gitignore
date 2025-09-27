@@ -51,7 +51,8 @@ lib/
 shared/
 native/
 release/
-*.exe
 
+main
+*.exe
 *.dll
 *.so
