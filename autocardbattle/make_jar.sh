@@ -1,1 +1,0 @@
-jar -cvmf manifest-linux64.txt release/main.jar *.class && cp -r $1 release

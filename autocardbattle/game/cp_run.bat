@@ -1,0 +1,1 @@
+javac -cp .;../../../lwjgl/* game/*.java && java -cp .;../../../lwjgl/* Main

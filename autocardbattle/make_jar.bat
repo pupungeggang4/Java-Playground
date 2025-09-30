@@ -1,1 +1,0 @@
-jar -cvmf manifest-win64.txt release/main.jar *.class && mkdir "release/lwjgl" && xcopy "%1" "release/lwjgl" /s
