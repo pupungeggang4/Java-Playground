@@ -1,0 +1,2 @@
+Main-Class: Main
+Class-Path: lwjgl/lwjgl.jar lwjgl/lwjgl-natives-macos-arm64.jar lwjgl/lwjgl-glfw.jar lwjgl/lwjgl-glfw-natives-macos-arm64.jar lwjgl/lwjgl-opengl.jar lwjgl/lwjgl-opengl-natives-macos-arm64.jar
