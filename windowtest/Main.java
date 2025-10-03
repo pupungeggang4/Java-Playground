@@ -9,5 +9,11 @@ public class Main {
         Screen screen = new Screen();
         frame.add(screen); // Add the custom panel
         frame.setVisible(true); // Make the frame visible
+
+        loop();
+    }
+
+    public static void loop() {
+        screen.repaint();
     }
 }
