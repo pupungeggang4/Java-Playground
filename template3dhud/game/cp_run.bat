@@ -1,1 +1,1 @@
-javac -cp .;../../../lwjgl/* *.java && java -cp .;../../../lwjgl/* Main
+javac -cp .;lwjgl/* *.java && java -cp .;lwjgl/* Main

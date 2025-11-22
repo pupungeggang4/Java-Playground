@@ -14,15 +14,16 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.stb.STBTruetype.*;
 import static org.lwjgl.util.freetype.FreeType.*;
 
 public class Main {
 	private long window;
-	ByteBuffer image, ttf, bitmap;
-	STBTTBakedChar.Buffer cdata;
 	int width, height, id;
-	STBTTFontinfo fontInfo;
+	ByteBuffer image;
+	PointerBuffer ftb;
+	long ftlib;
+	PointerBuffer faceb;
+	FT_Face face;
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -48,7 +49,7 @@ public class Main {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-		window = glfwCreateWindow(1280, 800, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(1280, 720, "LWJGL Text Test", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
@@ -69,12 +70,26 @@ public class Main {
 			);
 		}
 
+		try (MemoryStack stack = stackPush()) {
+			ftb = stack.mallocPointer(1);
+			faceb = stack.mallocPointer(1);
+			FT_Init_FreeType(ftb);
+			ftlib = ftb.get(0);
+			FT_New_Face(ftlib, "font/neodgm.ttf", 0, faceb);
+			long address = faceb.get(0);
+			face = FT_Face.create(address);
+			FT_Set_Pixel_Sizes(face, 0, 48);
+		} finally {
+
+		}
+
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
         GL.createCapabilities();
 
 		glEnable(GL_TEXTURE_2D);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		id = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -95,20 +110,6 @@ public class Main {
         } finally {
 
 		}
-
-		try {
-			InputStream i = new FileInputStream("font/neodgm.ttf");
-			byte[] ttfBytes = i.readAllBytes();
-			ttf = BufferUtils.createByteBuffer(ttfBytes.length);
-            ttf.put(ttfBytes).flip();
-
-			fontInfo = STBTTFontinfo.create();
-			stbtt_InitFont(fontInfo, ttf);
-		} catch (IOException e) {
-			
-		} finally {
-
-		}
 	}
 
 	private void loop() {
@@ -119,57 +120,76 @@ public class Main {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_TEXTURE_2D);
-			int character = 'A';
-			float size = 16;
-			float scale = stbtt_ScaleForPixelHeight(fontInfo, size);
-			int index = stbtt_FindGlyphIndex(fontInfo, character);
-			IntBuffer x0 = stackPush().mallocInt(1); 
-			IntBuffer y0 = stackPush().mallocInt(1); 
-			IntBuffer x1 = stackPush().mallocInt(1);
-			IntBuffer y1 = stackPush().mallocInt(1);
-			stbtt_GetGlyphBitmapBox(fontInfo, index, scale, scale, x0, y0, x1, y1);
-			int bitmapWidth = x1.get(0) - x0.get(0);
-    		int bitmapHeight = y1.get(0) - y0.get(0);
-			ByteBuffer bitmap = ByteBuffer.allocate(bitmapWidth * bitmapHeight);
-			stbtt_MakeGlyphBitmap(fontInfo, bitmap, bitmapWidth, bitmapHeight, bitmapWidth, scale, scale, index);
+			glBindTexture(GL_TEXTURE_2D, id);
+			drawString("Hello, World!", 32, 20, 20);
+			drawString("안녕하세요!", 32, 20, 60);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 	}
 
-    private void drawTriangle() {
-        float coords[] = {-0.9f, -0.9f, 0.0f, 0.9f, -0.9f, 0.0f, 0f, 0.7f, 0.0f};
-        float colors[] = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f}; 
-        FloatBuffer coordArray = BufferUtils.createFloatBuffer(9);
-        coordArray.put(coords).flip();
-        FloatBuffer colorArray = BufferUtils.createFloatBuffer(9);
-        colorArray.put(colors).flip();
-        glVertexPointer(3, GL_FLOAT, 0, coordArray);
-        glColorPointer(3, GL_FLOAT, 0, colorArray);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_COLOR_ARRAY);
+    private void drawTexture() {
+
     }
 
-    private void drawTexture() {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ONE, 128, 128, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
-		float texcoords[] = {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
-        float coords[] = {-0.5f, -0.8f, 0.5f, -0.8f, 0.5f, 0.8f, -0.5f, 0.8f}; 
-        FloatBuffer coordArray = BufferUtils.createFloatBuffer(8);
-        coordArray.put(coords).flip();
-        FloatBuffer texArray = BufferUtils.createFloatBuffer(8);
-        texArray.put(texcoords).flip();
-		glVertexPointer(2, GL_FLOAT, 0, coordArray);
-        glTexCoordPointer(2, GL_FLOAT, 0, texArray);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_QUADS, 0, 4);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
+	private void drawLetter(char letter, int size, float x, float y) {
+		FT_Set_Pixel_Sizes(face, 0, size);
+		FT_Load_Char(face, letter, FT_LOAD_RENDER);
+		int charWidth = face.glyph().bitmap().width();
+		int charHeight = face.glyph().bitmap().rows();
+		float xStart = x + face.glyph().bitmap_left();
+		float yStart = y + size - face.glyph().bitmap_top();
+
+		float renderWidth = charWidth / 1280.0f * 2.0f;
+		float renderHeight = charHeight / 720.0f * 2.0f;
+		float renderX = xStart / 1280.0f * 2.0f - 1.0f;
+		float renderY = -(yStart / 720.0f * 2.0f - 1.0f);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ONE, charWidth, charHeight, 0, GL_RED, GL_UNSIGNED_BYTE, face.glyph().bitmap().buffer(0));
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex2f(renderX, renderY - renderHeight);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex2f(renderX + renderWidth, renderY - renderHeight);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex2f(renderX + renderWidth, renderY);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2f(renderX, renderY);
+		glEnd();
+	}
+
+	private void drawString(String str, int size, float x, float y) {
+		FT_Set_Pixel_Sizes(face, 0, size);
+		float xPos = x;
+		float yPos = y;
+
+		for (int i = 0; i < str.length(); i++) {
+			FT_Load_Char(face, str.charAt(i), FT_LOAD_RENDER);
+			int charWidth = face.glyph().bitmap().width();
+			int charHeight = face.glyph().bitmap().rows();
+			float xStart = xPos + face.glyph().bitmap_left();
+			float yStart = yPos + size - face.glyph().bitmap_top();
+
+			float renderWidth = charWidth / 1280.0f * 2.0f;
+			float renderHeight = charHeight / 720.0f * 2.0f;
+			float renderX = xStart / 1280.0f * 2.0f - 1.0f;
+			float renderY = -(yStart / 720.0f * 2.0f - 1.0f);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ONE, charWidth, charHeight, 0, GL_RED, GL_UNSIGNED_BYTE, face.glyph().bitmap().buffer(0));
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(renderX, renderY - renderHeight);
+			glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(renderX + renderWidth, renderY - renderHeight);
+			glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(renderX + renderWidth, renderY);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(renderX, renderY);
+			glEnd();
+			
+			xPos += (face.glyph().advance().x() >> 6);
+		}
+	}
 
 	public static void main(String[] args) {
 		new Main().run();
