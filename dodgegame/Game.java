@@ -18,6 +18,7 @@ public class Game {
     public long window;
     public Field field;
     public Player player;
+    public float framePrevious, frameCurrent, delta;
 
     public void initGame() {
         player = new Player();
@@ -45,17 +46,25 @@ public class Game {
 			glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
 		}
         glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
         GL.createCapabilities();
+
+        framePrevious = (float)glfwGetTime();
     }
 
     public void loop() {
         while (!glfwWindowShouldClose(window)) {
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            render();
-            glfwSwapBuffers(window);
-			glfwPollEvents();
+            frameCurrent = (float)glfwGetTime();
+            float dt = frameCurrent - framePrevious;
+            if (dt >= 0.017) {
+                delta = dt;
+                framePrevious = frameCurrent;
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                render();
+                glfwSwapBuffers(window);
+                glfwPollEvents();
+            }
         }
     }
 

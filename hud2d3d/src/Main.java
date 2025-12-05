@@ -25,6 +25,7 @@ public class Main {
 	PointerBuffer faceb;
 	FT_Face face;
 	float angle = 0.0f;
+	float framePrevious, frameCurrent, delta;
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -71,7 +72,7 @@ public class Main {
 		}
 
 		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 		glfwShowWindow(window);
         GL.createCapabilities();
 
@@ -83,6 +84,8 @@ public class Main {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+		framePrevious = (float)glfwGetTime();
 	}
 
 	private void initImage() {
@@ -118,60 +121,53 @@ public class Main {
 	}
 
 	private void loop() {
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-		while ( !glfwWindowShouldClose(window) ) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			drawString("Hello, World!", 32, 20, 20);
-			drawString("안녕하세요!", 32, 20, 60);
-			drawImage(image, 320, 20);
-			drawCube();
-			glfwSwapBuffers(window);
-			glfwPollEvents();
+		while (!glfwWindowShouldClose(window)) {
+			frameCurrent = (float)glfwGetTime();
+			float dt = frameCurrent - framePrevious;
+			if (dt >= 0.016) {
+				delta = dt;
+				framePrevious = frameCurrent;
+				glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glMatrixMode(GL_MODELVIEW);
+				glLoadIdentity();
+				drawString("Hello, World!", 32, 20, 20);
+				drawString("안녕하세요!", 32, 20, 60);
+				drawImage(image, 320, 20);
+				drawCube();
+				glfwSwapBuffers(window);
+				glfwPollEvents();
+			}
 		}
 	}
 
 	private void drawCube() {
-		angle += 1.0f;
+		angle += 60.0f * delta;
 		glMatrixMode(GL_PROJECTION);
 		glOrtho(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f);
 		glLineWidth(4);
 		glRotatef(angle, 1.0f, 2.0f, 1.0f);
-		glBegin(GL_LINES);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		float vCoord[] = {
+			-0.3f, -0.3f, -0.3f, +0.3f, -0.3f, -0.3f, +0.3f, -0.3f, -0.3f, +0.3f, -0.3f, +0.3f,
+			+0.3f, -0.3f, +0.3f, -0.3f, -0.3f, +0.3f, -0.3f, -0.3f, +0.3f, -0.3f, -0.3f, -0.3f,
+			-0.3f, -0.3f, -0.3f, -0.3f, +0.3f, -0.3f, +0.3f, -0.3f, -0.3f, +0.3f, +0.3f, -0.3f,
+			+0.3f, -0.3f, +0.3f, +0.3f, +0.3f, +0.3f, -0.3f, -0.3f, +0.3f, -0.3f, +0.3f, +0.3f,
+			-0.3f, +0.3f, -0.3f, +0.3f, +0.3f, -0.3f, +0.3f, +0.3f, -0.3f, +0.3f, +0.3f, +0.3f,
+			+0.3f, +0.3f, +0.3f, -0.3f, +0.3f, +0.3f, -0.3f, +0.3f, +0.3f, -0.3f, +0.3f, -0.3f
+		};
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vCoord.length);
+		vertexBuffer.put(vCoord).flip();
+
 		glColor3f(1.0f, 1.0f, 1.0f);
-		glVertex3f(-0.3f, -0.3f, -0.3f);
-		glVertex3f(+0.3f, -0.3f, -0.3f);
-		glVertex3f(+0.3f, -0.3f, -0.3f);
-		glVertex3f(+0.3f, -0.3f, +0.3f);
-		glVertex3f(+0.3f, -0.3f, +0.3f);
-		glVertex3f(-0.3f, -0.3f, +0.3f);
-		glVertex3f(-0.3f, -0.3f, +0.3f);
-		glVertex3f(-0.3f, -0.3f, -0.3f);
-
-		glVertex3f(-0.3f, -0.3f, -0.3f);
-		glVertex3f(-0.3f, +0.3f, -0.3f);
-		glVertex3f(+0.3f, -0.3f, -0.3f);
-		glVertex3f(+0.3f, +0.3f, -0.3f);
-		glVertex3f(+0.3f, -0.3f, +0.3f);
-		glVertex3f(+0.3f, +0.3f, +0.3f);
-		glVertex3f(-0.3f, -0.3f, +0.3f);
-		glVertex3f(-0.3f, +0.3f, +0.3f);
-
-		glVertex3f(-0.3f, +0.3f, -0.3f);
-		glVertex3f(+0.3f, +0.3f, -0.3f);
-		glVertex3f(+0.3f, +0.3f, -0.3f);
-		glVertex3f(+0.3f, +0.3f, +0.3f);
-		glVertex3f(+0.3f, +0.3f, +0.3f);
-		glVertex3f(-0.3f, +0.3f, +0.3f);
-		glVertex3f(-0.3f, +0.3f, +0.3f);
-		glVertex3f(-0.3f, +0.3f, -0.3f);
-		glEnd();
+		glVertexPointer(3, GL_FLOAT, 0, vertexBuffer);
+		glDrawArrays(GL_LINES, 0, 24);
 	}
 
     private void drawImage(Image image, float x, float y) {
@@ -183,17 +179,18 @@ public class Main {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(renderX, renderY - renderHeight);
-		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(renderX + renderWidth, renderY - renderHeight);
-		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(renderX + renderWidth, renderY);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(renderX, renderY);
-		glEnd();
-
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		float vCoord[] = {renderX, renderY - renderHeight, renderX + renderWidth, renderY - renderHeight, renderX + renderWidth, renderY, renderX, renderY};
+		float tCoord[] = {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vCoord.length);
+		vertexBuffer.put(vCoord).flip();
+		FloatBuffer textureBuffer = BufferUtils.createFloatBuffer(tCoord.length);
+		textureBuffer.put(tCoord).flip();
+		glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+		glTexCoordPointer(2, GL_FLOAT, 0, textureBuffer);
+		glDrawArrays(GL_QUADS, 0, 4);
     }
 
 	private void drawLetter(char letter, int size, float x, float y) {
@@ -212,16 +209,18 @@ public class Main {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ONE, charWidth, charHeight, 0, GL_RED, GL_UNSIGNED_BYTE, face.glyph().bitmap().buffer(0));
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(renderX, renderY - renderHeight);
-		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(renderX + renderWidth, renderY - renderHeight);
-		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(renderX + renderWidth, renderY);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(renderX, renderY);
-		glEnd();
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		float vCoord[] = {renderX, renderY - renderHeight, renderX + renderWidth, renderY - renderHeight, renderX + renderWidth, renderY, renderX, renderY};
+		float tCoord[] = {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vCoord.length);
+		vertexBuffer.put(vCoord).flip();
+		FloatBuffer textureBuffer = BufferUtils.createFloatBuffer(tCoord.length);
+		textureBuffer.put(tCoord).flip();
+		glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+		glTexCoordPointer(2, GL_FLOAT, 0, textureBuffer);
+		glDrawArrays(GL_QUADS, 0, 4);
 	}
 
 	private void drawString(String str, int size, float x, float y) {
@@ -244,16 +243,18 @@ public class Main {
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, id);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ONE, charWidth, charHeight, 0, GL_RED, GL_UNSIGNED_BYTE, face.glyph().bitmap().buffer(0));
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex2f(renderX, renderY - renderHeight);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex2f(renderX + renderWidth, renderY - renderHeight);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex2f(renderX + renderWidth, renderY);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex2f(renderX, renderY);
-			glEnd();
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+			float vCoord[] = {renderX, renderY - renderHeight, renderX + renderWidth, renderY - renderHeight, renderX + renderWidth, renderY, renderX, renderY};
+			float tCoord[] = {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+			FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vCoord.length);
+			vertexBuffer.put(vCoord).flip();
+			FloatBuffer textureBuffer = BufferUtils.createFloatBuffer(tCoord.length);
+			textureBuffer.put(tCoord).flip();
+			glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+			glTexCoordPointer(2, GL_FLOAT, 0, textureBuffer);
+			glDrawArrays(GL_QUADS, 0, 4);
 			
 			xPos += (face.glyph().advance().x() >> 6);
 		}
